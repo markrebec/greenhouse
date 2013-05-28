@@ -1,8 +1,13 @@
 module Greenhouse
-  VERSION = "0.0.3"
+  VERSION = "0.0.4"
 end
 
 __END__
+0.0.4:
+* Fixed bug with new not referencing the active binary
+* Fixed a couple off by one errors in resource files
+* Printing version in binary usage output
+
 0.0.3:
 * Ability to set the CLI binary name
 * Broke out Forth Rail specific stuff into it's own binary `forthrail`
