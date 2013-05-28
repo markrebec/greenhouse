@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+#
+# Greenhouse
+#
+$:.unshift File.expand_path("../../lib", __FILE__)
+
+require 'greenhouse'
+
+Greenhouse::CLI::start

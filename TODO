@@ -1,0 +1,8 @@
+- FileResource: track lines for objects, keep comment lines around when rewriting files (done: procfile, ignorefile; not done: dotenv, projectsfile)
+- Logger class
+- --force flag for push
+
+- Detect current path to determine available commands and context (i.e. running `sync` from within a project would sync just that project)
+- Localize gems in gemfile (point to local paths), and check for localized gems before commits (https://gist.github.com/christhekeele/5594243)
+
+- Track last fetched time for repos? Only fetch every x interval, allow force?
