@@ -8,7 +8,7 @@ module Greenhouse
 
       class << self
         def usage
-          puts "usage: #{::Greenhouse::CLI.command_name} #{command_name} <name> #{valid_arguments.to_s}"
+          puts "usage: #{::Greenhouse::CLI::binary} #{command_name} <name> #{valid_arguments.to_s}"
         end
       end
 
@@ -21,7 +21,7 @@ module Greenhouse
         projects_directory = arguments.first.key
         if File.exists?(projects_directory)
           STDERR.puts "Directory already exists: #{projects_directory}"
-          STDERR.puts "You can try running `#{::Greenhouse::CLI.command_name} init` from inside the directory."
+          STDERR.puts "You can try running `#{::Greenhouse::CLI::binary} init` from inside the directory."
           exit 1
         end
 
@@ -32,10 +32,7 @@ module Greenhouse
           exit 1
         end
         
-        exec "cd #{projects_directory}; greenhouse init"
-        #Dir.chdir(projects_directory) do
-        #  Init.run
-        #end
+        exec "cd #{projects_directory}; #{::Greenhouse::CLI::binary} init"
       end
     end
   end
