@@ -36,7 +36,7 @@ module Greenhouse
           # TODO delete any comments immediately preceding the filename
           deleted = super(select { |f| f.file == filename}.first)
           @ignore_file.ignored.each do |ignored|
-            next if ignored.line < deleted.line
+            next if ignored.line <= deleted.line
             ignored.line -= 1
           end
           line = @ignore_file.lines.slice!(deleted.line,1)

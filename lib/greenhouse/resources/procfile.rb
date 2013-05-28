@@ -25,7 +25,7 @@ module Greenhouse
         def delete(key)
           del = super(key)
           @procfile.processes.each do |key,process|
-            next if process.line < del.line
+            next if process.line <= del.line
             process.line -= 1
           end
           line = @procfile.lines.slice!(del.line,1)
