@@ -1,6 +1,7 @@
 require 'bundler'
 require 'rake'
 require 'active_support/inflector'
+require 'greenhouse/version'
 require 'greenhouse/resources'
 require 'greenhouse/projects'
 require 'greenhouse/scripts'

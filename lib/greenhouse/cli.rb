@@ -56,9 +56,18 @@ module Greenhouse
       binary
     end
 
+    def self.version=(ver)
+      @version = ver
+    end
+
+    def self.version
+      @version ||= VERSION
+    end
+
     def self.usage
       puts <<USAGE
-usage: #{command_name} #{valid_arguments.to_s} <command> [<args>]
+#{binary} v#{version} 
+usage: #{binary} #{valid_arguments.to_s} <command> [<args>]
         
 The available greenhouse commands are:
 USAGE
@@ -69,7 +78,7 @@ USAGE
       end
 
       puts
-      puts "See `#{command_name} help <command>` for more information on a specific command."
+      puts "See `#{binary} help <command>` for more information on a specific command."
     end
     
     def self.start
