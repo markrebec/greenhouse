@@ -1,8 +1,11 @@
 module Greenhouse
-  VERSION = "0.0.4"
+  VERSION = "0.0.5"
 end
 
 __END__
+0.0.5:
+* Fix for pushing projects by ensuring each branch is pushed individually
+
 0.0.4:
 * Fixed bug with new not referencing the active binary
 * Fixed a couple off by one errors in resource files
