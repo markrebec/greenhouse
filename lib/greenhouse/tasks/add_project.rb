@@ -6,7 +6,7 @@ module Greenhouse
       def prompt_for_project
         remote = nil
         print "Enter a git remote to add a project (leave blank to skip): "
-        remote = STDIN.gets.chomp.downcase
+        remote = STDIN.gets.chomp
         return if remote.empty?
         project = Projects::Project.new(remote.match(/([^\/]*)\.git/)[1], {remote: remote})
         
