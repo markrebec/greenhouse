@@ -78,16 +78,16 @@ module Greenhouse
             argarr = arg.split("=")
             argkey = argarr.slice!(0)
             
-            if !valid_arguments.concat(project_arguments).map(&:keys).any? { |keys| keys.include?(argkey) } && !arg.match(/\A(-)+[a-z0-9\-]=?.*\Z/i) && (a > 0 && args[a-1].match(/\A(-)+[a-z0-9\-]=?.*\Z/i)) && !@arguments.empty?
+            if !valid_arguments.clone.concat(project_arguments).map(&:keys).any? { |keys| keys.include?(argkey) } && !arg.match(/\A(-)+[a-z0-9\-]=?.*\Z/i) && (a > 0 && args[a-1].match(/\A(-)+[a-z0-9\-]=?.*\Z/i)) && !@arguments.empty?
               @arguments.last.value = arg
               next
             end
 
             if validate_arguments?
-              raise InvalidArgument, "Invalid Argument: #{arg}" unless valid_arguments.concat(project_arguments).map(&:keys).any? { |keys| keys.include?(argkey) }
-              @arguments << valid_arguments.concat(project_arguments).select { |varg| varg.keys.include?(argkey) }.first
+              raise InvalidArgument, "Invalid Argument: #{arg}" unless valid_arguments.clone.concat(project_arguments).map(&:keys).any? { |keys| keys.include?(argkey) }
+              @arguments << valid_arguments.clone.concat(project_arguments).select { |varg| varg.keys.include?(argkey) }.first
             else
-              valid_arg = valid_arguments.concat(project_arguments).select { |varg| varg.keys.include?(argkey) }.first
+              valid_arg = valid_arguments.clone.concat(project_arguments).select { |varg| varg.keys.include?(argkey) }.first
               @arguments << (valid_arg || Argument.new(argkey))
             end
             @arguments.last.value = argarr.join("=") unless argarr.empty?
