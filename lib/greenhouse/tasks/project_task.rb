@@ -283,7 +283,9 @@ module Greenhouse
           end
 
           print "Pushing local branches..."
-          @project.repository.push
+          @project.repository.branches.local.each do |branch|
+            @project.repository.push('origin', branch.name)
+          end
           puts "\e[32mSuccess.\e[0m"
           return true
         end
