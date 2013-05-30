@@ -15,8 +15,8 @@ module Greenhouse
       
       def initialize(name, args={})
         @name = name
-        @title = args.delete('title') || name.camelize
-        @ignored = (args.has_key?('ignore') ? [args.delete('ignore')] : []).flatten
+        @title = args.delete(:title) || name.camelize
+        @ignored = (args.has_key?(:ignore) ? [args.delete(:ignore)] : []).flatten
         @repository = Repository.new(name, args)
         @ignore_file = Resources::IgnoreFile.new("#{path}/.ignore")
       end

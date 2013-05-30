@@ -30,7 +30,7 @@ module Greenhouse
       
       projects_file.projects.each do |name,project|
         type = (project.has_key?('type') ? project['type'] : 'project')
-        projargs = project.merge({:remote => (project['remote'] || project['git'])})
+        projargs = Hash[project.merge({:remote => (project['remote'] || project['git'])}).map{ |k,v| [k.to_sym, v] }]
         classname = "Greenhouse::Projects::#{type.singularize.camelize}"
         @@projects << (defined?(classname.constantize) ? classname.constantize.new(name, projargs) : Greenhouse::Projects::Project.new(name, projargs))
       end
