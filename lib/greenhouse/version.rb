@@ -1,8 +1,13 @@
 module Greenhouse
-  VERSION = "0.0.5"
+  VERSION = "0.0.6"
 end
 
 __END__
+0.0.6:
+* Don't downcase git repos (duh)
+* Add console command to easily run rails console for rails apps
+* Some minor internal cleanup
+
 0.0.5:
 * Fix for pushing projects by ensuring each branch is pushed individually
 
