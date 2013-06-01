@@ -20,6 +20,7 @@ module Greenhouse
           @command_summary = summary unless summary.nil?
           @command_summary
         end
+        alias_method :summary, :command_summary
 
         def usage
           puts "usage: #{::Greenhouse::CLI.command_name} #{command_name} #{valid_arguments.to_s}"
@@ -34,7 +35,7 @@ module Greenhouse
           rescue Exception => e
             puts e.message
             @command.usage if e.is_a?(Scripts::InvalidArgument)
-            exit 1
+            return
           end
         end
 
