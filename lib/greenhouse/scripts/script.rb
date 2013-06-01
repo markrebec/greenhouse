@@ -12,7 +12,7 @@ module Greenhouse
         
         def run
           @script ||= new
-          raise "You have not defined a `run` method for your script." unless @script.respond_to?(:run)
+          raise "You must define a `run` method for your script." unless @script.respond_to?(:run)
           @script.run
         end
 
