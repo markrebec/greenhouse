@@ -7,7 +7,7 @@ module Greenhouse
       def perform(project, verbose=false)
         @project = project
         
-        @project.repository.fetch if @project.exists?
+        @project.repository.fetch if verbose && @project.exists?
 
         puts "  \e[36m#{@project.title}\e[0m (#{@project.type.capitalize})"
         puts "    #{@project.repository.remote}"
