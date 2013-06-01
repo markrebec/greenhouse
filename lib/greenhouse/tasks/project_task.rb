@@ -14,9 +14,9 @@ module Greenhouse
           base.send :alias_method, :klone, :clone
         end
 
-        def bundle
+        def bundle(cmd='install')
           puts "Running Bundler for \e[36m#{@project.title}\e[0m..."
-          @project.bundle
+          @project.bundle(cmd)
           true
         rescue Exception => e
           puts "\e[31mError running Bundler for #{@project.title}\e[0m"
