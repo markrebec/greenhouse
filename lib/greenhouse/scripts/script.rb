@@ -17,7 +17,6 @@ module Greenhouse
         end
 
         def validate_arguments(val=nil)
-          return validate_arguments? if val.nil?
           @validate_arguments = val
         end
 
@@ -49,50 +48,72 @@ module Greenhouse
         end
         
         def project_argument(proj)
-          @valid_projs ||= Arguments.new
+          @valid_projects ||= Arguments.new
           if proj.is_a?(Argument)
-            @valid_projs << proj
+            @valid_projects << proj
           elsif proj.is_a?(Hash)
-            @valid_projs << Argument.new(proj.keys.first.to_s, proj.values.first)
+            @valid_projects << Argument.new(proj.keys.first.to_s, proj.values.first)
           elsif proj.is_a?(Array)
-            @valid_projs << Argument.new(proj[0].to_s, (proj.length > 1 ? proj[1] : []))
+            @valid_projects << Argument.new(proj[0].to_s, (proj.length > 1 ? proj[1] : []))
           else
-            @valid_projs << Argument.new(proj.to_s)
+            @valid_projects << Argument.new(proj.to_s)
           end
-          @valid_projs.last
+          @valid_projects.last
         end
 
         def project_arguments(*projs)
-          @valid_projs ||= Arguments.new
-          return @valid_projs if projs.empty?
+          @valid_projects ||= Arguments.new
+          return @valid_projects if projs.empty?
           
           projs.each { |proj| project_argument(proj) }
-          @valid_projs
+          @valid_projects
         end
 
         def arguments(*args)
-          @arguments ||= nil
-          return @arguments unless @arguments.nil?
+          add_arguments(*args)
+        end
+
+        def user_arguments
+          arguments
+        end
+
+        def set_arguments(*args)
           @arguments = Arguments.new
+          add_arguments(*args)
+        end
+
+        def add_arguments(*args)
+          @arguments ||= Arguments.new
           args.each_with_index do |arg,a|
-            argarr = arg.split("=")
-            argkey = argarr.slice!(0)
+            argk, argv = *parse_arg(arg)
             
-            if !valid_arguments.clone.concat(project_arguments).map(&:keys).any? { |keys| keys.include?(argkey) } && !arg.match(/\A(-)+[a-z0-9\-]=?.*\Z/i) && (a > 0 && args[a-1].match(/\A(-)+[a-z0-9\-]=?.*\Z/i)) && !@arguments.empty?
+            if !valid_argument?(argk) && !argument_flag?(arg) && (a > 0 && argument_flag?(args[a-1]))
               @arguments.last.value = arg
               next
             end
 
-            if validate_arguments?
-              raise InvalidArgument, "Invalid Argument: #{arg}" unless valid_arguments.clone.concat(project_arguments).map(&:keys).any? { |keys| keys.include?(argkey) }
-              @arguments << valid_arguments.clone.concat(project_arguments).select { |varg| varg.keys.include?(argkey) }.first
-            else
-              valid_arg = valid_arguments.clone.concat(project_arguments).select { |varg| varg.keys.include?(argkey) }.first
-              @arguments << (valid_arg || Argument.new(argkey))
-            end
-            @arguments.last.value = argarr.join("=") unless argarr.empty?
+            raise InvalidArgument, "Invalid Argument: #{arg}" if validate_arguments? && !valid_argument?(argk)
+            @arguments << argument_object(argk)
+            @arguments.last.value = argv unless argv.empty?
           end
           @arguments
+        end
+
+        def parse_arg(arg)
+          arga = arg.split("=")
+          [arga.slice!(0), arga.join("=")]
+        end
+        
+        def valid_argument?(key)
+          valid_arguments.clone.concat(project_arguments).map(&:keys).flatten.include?(key)#.any? { |keys| keys.include?(key) }
+        end
+
+        def argument_flag?(arg)
+          arg.match(/\A(-)+[a-z0-9\-]=?.*\Z/i)
+        end
+
+        def argument_object(key)
+          valid_arguments.clone.concat(project_arguments).select { |varg| varg.keys.include?(key) }.first || Argument.new(key)
         end
       end
 
