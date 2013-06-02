@@ -87,7 +87,7 @@ module Greenhouse
           args.each_with_index do |arg,a|
             argk, argv = *parse_arg(arg)
             
-            if !valid_argument?(argk) && !argument_flag?(arg) && (a > 0 && argument_flag?(args[a-1]))
+            if !argument_flag?(arg) && !valid_argument?(argk) && (a > 0 && argument_flag?(args[a-1]))
               @arguments.last.value = arg
               next
             end
@@ -105,7 +105,7 @@ module Greenhouse
         end
         
         def valid_argument?(key)
-          valid_arguments.clone.concat(project_arguments).map(&:keys).flatten.include?(key)#.any? { |keys| keys.include?(key) }
+          valid_arguments.clone.concat(project_arguments).map(&:keys).flatten.include?(key)
         end
 
         def argument_flag?(arg)

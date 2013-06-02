@@ -25,7 +25,7 @@ module Greenhouse
 
         if args.length > 0 && args[0].is_a?(Hash)
           opts = args.slice!(0)
-          @valid = (opts[:valid].is_a?(Array) ? opts[:valid].map(&:to_s) : opts[:valid].to_s) if opts.has_key?(:valid)
+          @valid = (opts[:valid].is_a?(Array) ? opts[:valid].map(&:to_s) : [opts[:valid].to_s]) if opts.has_key?(:valid)
           @summary = opts[:summary] if opts.has_key?(:summary)
         end
         
