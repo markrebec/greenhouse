@@ -9,12 +9,20 @@ module Greenhouse
       end
 
       module ClassMethods
+        def self.extended(base)
+          base.send :attr_reader, :results
+        end
+
         def perform(*args)
           @task = new
           @task.before(*args) if @task.respond_to?(:before)
           @task.perform(*args)
           @task.after(*args) if @task.respond_to?(:after)
           @task
+        end
+
+        def results
+          (@task ||= new).results
         end
       end
 
