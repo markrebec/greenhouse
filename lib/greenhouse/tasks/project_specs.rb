@@ -18,9 +18,9 @@ module Greenhouse
         Bundler.with_clean_env do
           @project.chdir do
             puts "Running specs for \e[36m#{@project.title}\e[0m..."
-            #File.unlink(rspec_output_file) if File.exists?(rspec_output_file)
-            #File.unlink(coverage_output_file) if File.exists?(coverage_output_file)
-            #Greenhouse::CLI.exec "bundle exec rspec --format=json --out=#{rspec_output_file}"
+            File.unlink(rspec_output_file) if File.exists?(rspec_output_file)
+            File.unlink(coverage_output_file) if File.exists?(coverage_output_file)
+            Greenhouse::CLI.exec "bundle exec rspec --format=json --out=#{rspec_output_file}"
           end
         end
 
