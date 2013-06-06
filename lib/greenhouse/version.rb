@@ -1,8 +1,14 @@
 module Greenhouse
-  VERSION = "0.0.6"
+  VERSION = "0.0.7"
 end
 
 __END__
+0.0.7:
+* Simple bundler command to run install/update for a single or all projects
+* Refactor `status` command, renamed --verbose flag to --git, only fetching git remotes with --git flag
+* Cleanup for script arguments
+* Dummy `specs` command as a placeholder to be overridden by extensions
+
 0.0.6:
 * Don't downcase git repos (duh)
 * Add console command to easily run rails console for rails apps
