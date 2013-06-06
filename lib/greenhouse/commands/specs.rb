@@ -38,36 +38,17 @@ USAGE
       end
 
       def print_results(*results)
-        puts
-        puts "Results:"
         results.each do |result|
           next if result[:rspec].nil?
-          next unless result[:rspec]['summary']['pending_count'] > 0 || result[:rspec]['summary']['failure_count'] > 0
-          puts
+          next unless result[:rspec].pending.count > 0 || result[:rspec].failed.count > 0
+          
           puts "  \e[36m#{result[:project].title}\e[0m"
 
-          if result[:rspec]['summary']['pending_count'] > 0
-            puts "    Pending:"
-            result[:rspec]['examples'].select { |ex| ex['status'] == 'pending' }.each do |pending|
-              puts "      \e[33m#{pending['full_description']}\e[0m"
-              puts "        \e[34m# Not Yet Implemented\e[0m"
-              puts "        \e[34m# #{pending['file_path']}:#{pending['line_number']}\e[0m"
-            end
-            puts
-          end
-
-
-          if result[:rspec]['summary']['failure_count'] > 0
-            puts "    Failures:"
-            result[:rspec]['examples'].select { |ex| ex['status'] == 'failed' }.each_with_index do |failed,f|
-              puts "      #{f+1}) #{failed['full_description']}"
-              line_no = failed['exception']['backtrace'].select { |line| line.match(/#{failed['file_path'].gsub(/\A\.\//, '').gsub(/\//, '\/')}/) }.first.split(":")[1].to_i
-              puts "         \e[31mFailure/Error: #{File.read("#{result[:project].path}/#{failed['file_path']}").split("\n")[line_no - 1].lstrip} \n           #{failed['exception']['message'].split("\n").join("\n      ")}\e[0m"
-              puts "         \e[34m# #{failed['file_path']}:#{line_no}:#{failed['exception']['backtrace'].select { |line| line.match(/#{failed['file_path'].gsub(/\A\.\//, '').gsub(/\//, '\/')}/) }.first.split(":").last}\e[0m"
-            end
-            puts
-          end
+          puts result[:rspec].pending.to_result_string if result[:rspec].pending.count > 0
           
+          puts result[:rspec].failed.to_result_string if result[:rspec].failed.count > 0
+
+
           unless result[:coverage].nil?
             puts
             puts "    Coverage:"
@@ -119,24 +100,13 @@ USAGE
       end
 
       def print_summaries(*results)
-        puts
-        puts "Summary:"
         results.each do |result|
           next if result[:rspec].nil?
           
-          puts "  \e[36m#{result[:project].title}\e[0m finished in #{result[:rspec]['summary']['duration'].to_f.round(2)} seconds"
+          puts "  \e[36m#{result[:project].title}\e[0m finished in #{result[:rspec].duration} seconds"
           
-          if result[:rspec]['summary']['failure_count'] > 0
-            print "    \e[31m"
-          elsif result[:rspec]['summary']['pending_count'] > 0
-            print "    \e[33m"
-          elsif result[:rspec]['summary']['example_count'] > 0
-            print "    \e[32m"
-          else
-            print "    "
-          end
-          print "#{result[:rspec]['summary_line']}\e[0m"
-          
+          print result[:rspec].to_summary
+
           if result[:coverage].nil?
             puts
           else
@@ -162,16 +132,9 @@ USAGE
             end
             puts "#{"%.2f%% coverage" % total_coverage(total_hits, total_lines)}\e[0m"
           end
-          
-          if result[:rspec]['summary']['failure_count'] > 0
-            puts
-            puts "    Failed Examples:"
-            result[:rspec]['examples'].select { |ex| ex['status'] == 'failed' }.each_with_index do |failed,f|
-              puts "      \e[31mrspec #{failed['file_path']}:#{failed['line_number']}\e[0m \e[34m# #{failed['full_description']}\e[0m"
-            end
-          end
-          
           puts
+          
+          puts result[:rspec].failed.to_summary if result[:rspec].failed.count > 0
         end
       end
 

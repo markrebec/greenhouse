@@ -19,6 +19,5 @@ Gem::Specification.new do |s|
   s.add_dependency "git"
   s.add_dependency "foreman"
   s.add_dependency "activesupport"
-
-  s.add_development_dependency "rspec"
+  s.add_dependency "rspec"
 end

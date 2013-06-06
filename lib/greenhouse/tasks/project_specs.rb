@@ -15,19 +15,17 @@ module Greenhouse
 
       def perform(project)
         @project = project
-        
-        File.unlink(rspec_output_file) if File.exists?(rspec_output_file)
-        File.unlink(coverage_output_file) if File.exists?(coverage_output_file)
-        
         Bundler.with_clean_env do
           @project.chdir do
             puts "Running specs for \e[36m#{@project.title}\e[0m..."
-            Greenhouse::CLI.exec "bundle exec rspec --format=json --out=#{rspec_output_file}"
+            #File.unlink(rspec_output_file) if File.exists?(rspec_output_file)
+            #File.unlink(coverage_output_file) if File.exists?(coverage_output_file)
+            #Greenhouse::CLI.exec "bundle exec rspec --format=json --out=#{rspec_output_file}"
           end
         end
 
         @results = {project: @project,
-                    rspec: (File.exists?(rspec_output_file) ? JSON.parse(File.read(rspec_output_file)) : nil),
+                    rspec: (File.exists?(rspec_output_file) ? Resources::Specs::RspecResults[JSON.parse(File.read(rspec_output_file)).to_a] : nil),
                     coverage: (File.exists?(coverage_output_file) ? YAML.load_file(coverage_output_file) : nil)}
       end
     end
