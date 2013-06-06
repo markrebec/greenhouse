@@ -23,8 +23,8 @@ module Greenhouse
       end
 
       class Results < Array
-        def output
-          print_details
+        def output(verbose=true)
+          print_details if verbose
           print_summary
         end
 

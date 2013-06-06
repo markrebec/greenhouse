@@ -14,6 +14,7 @@ module Greenhouse
 
       def perform(project)
         @project = project
+        
         Bundler.with_clean_env do
           @project.chdir do
             puts "Running specs for \e[36m#{@project.title}\e[0m..."

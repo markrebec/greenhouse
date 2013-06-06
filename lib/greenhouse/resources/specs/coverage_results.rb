@@ -87,7 +87,7 @@ RESULT
         end
 
         def results
-          @results ||= @raw_results.select { |key,value| key.start_with?(project.path) && !key.match(/#{project.path}\/spec/) }
+          @results ||= @raw_results.select { |key,value| key.start_with?(project.path) && !key.match(/#{project.path}\/spec/) && !key.match(/#{project.path}\/db/) }
         end
       end
     end

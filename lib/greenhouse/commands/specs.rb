@@ -4,6 +4,7 @@ module Greenhouse
       include Command
       command_summary "Run rspec for one or all of your projects"
       # TODO -q/--quiet argument
+      valid_argument Scripts::Argument.new("-q, --quiet", [], :summary => "Do not print out detailed information about specs and coverage")
       project_arguments *Projects::projects.map(&:to_arg)
       
       class << self
@@ -20,16 +21,23 @@ USAGE
         end
       end
 
+      def quiet?
+        arguments.map(&:key).include?("-q")
+      end
+
       def run_all_specs
         results = Resources::Specs::Results.new
         Projects::projects.each do |project|
           results << Tasks::ProjectSpecs.perform(project).results
         end
-        results.output
+        puts
+        results.output(!quiet?)
       end
 
       def run_project_specs
-        Resources::Specs::Results.new([Tasks::ProjectSpecs.perform(@project).results]).output
+        results = Resources::Specs::Results.new([Tasks::ProjectSpecs.perform(@project).results])
+        puts
+        results.output(!quiet?)
       end
 
       def run
