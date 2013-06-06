@@ -1,4 +1,3 @@
-require 'json'
 module Greenhouse
   module Tasks
     class ProjectSpecs
@@ -24,9 +23,7 @@ module Greenhouse
           end
         end
 
-        @results = {project: @project,
-                    rspec: (File.exists?(rspec_output_file) ? Resources::Specs::RspecResults[JSON.parse(File.read(rspec_output_file)).to_a] : nil),
-                    coverage: (File.exists?(coverage_output_file) ? YAML.load_file(coverage_output_file) : nil)}
+        @results = Resources::Specs::Result.new(@project, rspec_output_file, coverage_output_file)
       end
     end
   end

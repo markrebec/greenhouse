@@ -44,12 +44,13 @@ RESULT
       end
 
       class FailedExample < RspecExample
-        attr_reader :exception
+        attr_reader :exception, :index
 
-        def initialize(example)
-          super
+        def initialize(example, index)
+          super(example)
           @exception = example['exception']['class'].constantize.new(example['exception']['message'])
           @exception.set_backtrace example['exception']['backtrace']
+          @index = index
         end
         
         def to_s
@@ -58,10 +59,11 @@ RESULT
 
         def to_result_string
           <<RESULT
-      #{1.to_s}) #{full_description}
-         \e[31mFailure/Error: #{relevant_line}
-         #{message.gsub("\n", "\n         ")}\e[0m
-         \e[34m# #{file_path}:#{relevant_line_number}:#{relevant_context}\e[0m
+      #{index.to_s}) #{full_description}
+      #{"%#{index.to_s.length+2}s" % ""}\e[31mFailure/Error: #{relevant_line}
+      #{"%#{index.to_s.length+2}s" % ""}#{message.gsub("\n", "\n         ")}\e[0m
+      #{"%#{index.to_s.length+2}s" % ""}\e[34m# #{file_path}:#{relevant_line_number}:#{relevant_context}\e[0m
+
 RESULT
         end
 
@@ -117,7 +119,6 @@ SUMMARY
           <<RESULTS
     Pending:
 #{map(&:to_result_string).join}
-
 RESULTS
         end
       end
@@ -127,7 +128,6 @@ RESULTS
           <<RESULTS
     Failures:
 #{map(&:to_result_string).join}
-
 RESULTS
         end
         
@@ -135,7 +135,6 @@ RESULTS
           <<SUMMARY
     Failed Examples:
 #{map(&:to_summary).join}
-
 SUMMARY
         end
       end
@@ -151,6 +150,7 @@ SUMMARY
 
         def examples
           return RspecExamples.new unless keys.include?('examples')
+          failures = 0
           RspecExamples.new(self['examples'].map do |ex|
             case ex['status']
             when 'passed'
@@ -158,7 +158,7 @@ SUMMARY
             when 'pending'
               PendingExample.new(ex)
             when 'failed'
-              FailedExample.new(ex)
+              FailedExample.new(ex, failures += 1)
             end
           end)
         end
@@ -190,7 +190,7 @@ SUMMARY
         end
 
         def to_summary
-          "  #{summary_text_color}#{summary_text}\e[0m"
+          "    #{summary_text_color}#{summary_text}\e[0m"
         end
         
         def summary_text
