@@ -6,6 +6,7 @@ module Greenhouse
 
       def perform(project, verbose=false)
         @project = project
+        @project.repository.not_checked_out
         
         @project.repository.fetch if verbose && @project.exists?
 
@@ -28,6 +29,7 @@ module Greenhouse
             print_local_changes(4) if @project.repository.changes?
             print_unpushed_branches(4) if @project.repository.ahead?
             print_out_of_sync_branches(4) if @project.repository.out_of_sync?
+            print_not_checked_out_branches(4) if @project.repository.not_checked_out?
           end
         end
 

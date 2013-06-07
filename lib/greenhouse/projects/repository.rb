@@ -74,6 +74,17 @@ module Greenhouse
         end
       end
 
+      def not_checked_out?
+        !not_checked_out.empty?
+      end
+
+      # Remote branches that aren't checked out locally
+      def not_checked_out
+        git.branches.remote.select do |branch|
+          !branch.full.match(/HEAD/) && !git.branches.local.map(&:name).include?(branch.full.split("/").last)
+        end
+      end
+
       # Check whether local branches are synced with the remotes
       def synced?
         unsynced.empty?
@@ -85,9 +96,13 @@ module Greenhouse
         git.branches.local.each do |branch|
           git.remotes.each do |remote|
             lcommit = git.object(branch.name).log.first
-            rcommit = git.object("#{remote.name}/#{branch.name}").log.first
-            next if lcommit.sha == rcommit.sha
-            branches << [branch, remote]
+            begin
+              rcommit = git.object("#{remote.name}/#{branch.name}").log.first
+              next if lcommit.sha == rcommit.sha
+              branches << [branch, remote]
+            rescue # can this just be an ensure? will the next still work without ensuring?
+              branches << [branch, remote]
+            end
           end
         end
         branches
@@ -102,11 +117,15 @@ module Greenhouse
       def ahead
         unsynced.select do |branch|
           lbranch = git.object(branch[0].name)
-          rbranch = git.object("#{branch[1].name}/#{branch[0].name}")
-          lcommit = lbranch.log.first
-          rcommit = rbranch.log.first
+          begin
+            rbranch = git.object("#{branch[1].name}/#{branch[0].name}")
+            lcommit = lbranch.log.first
+            rcommit = rbranch.log.first
           
-          !rbranch.log.map(&:sha).include?(lcommit.sha) && lbranch.log.map(&:sha).include?(rcommit.sha)
+            !rbranch.log.map(&:sha).include?(lcommit.sha) && lbranch.log.map(&:sha).include?(rcommit.sha)
+          rescue
+            true
+          end
           
           #lcommit.date <= rcommit.date
         end
@@ -121,11 +140,15 @@ module Greenhouse
       def behind
         unsynced.select do |branch|
           lbranch = git.object(branch[0].name)
-          rbranch = git.object("#{branch[1].name}/#{branch[0].name}")
-          lcommit = lbranch.log.first
-          rcommit = rbranch.log.first
-          
-          rbranch.log.map(&:sha).include?(lcommit.sha) && !lbranch.log.map(&:sha).include?(rcommit.sha)
+          begin
+            rbranch = git.object("#{branch[1].name}/#{branch[0].name}")
+            lcommit = lbranch.log.first
+            rcommit = rbranch.log.first
+            
+            rbranch.log.map(&:sha).include?(lcommit.sha) && !lbranch.log.map(&:sha).include?(rcommit.sha)
+          rescue
+            false
+          end
           
           #lcommit.date >= rcommit.date
         end
@@ -138,11 +161,15 @@ module Greenhouse
       def diverged
         unsynced.select do |branch|
           lbranch = git.object(branch[0].name)
-          rbranch = git.object("#{branch[1].name}/#{branch[0].name}")
-          lcommit = lbranch.log.first
-          rcommit = rbranch.log.first
+          begin
+            rbranch = git.object("#{branch[1].name}/#{branch[0].name}")
+            lcommit = lbranch.log.first
+            rcommit = rbranch.log.first
           
-          !rbranch.log.map(&:sha).include?(lcommit.sha) && !lbranch.log.map(&:sha).include?(rcommit.sha)
+            !rbranch.log.map(&:sha).include?(lcommit.sha) && !lbranch.log.map(&:sha).include?(rcommit.sha)
+          rescue
+            false
+          end
         end
       end
 
@@ -157,12 +184,16 @@ module Greenhouse
       def out_of_sync
         unsynced.select do |branch|
           lbranch = git.object(branch[0].name)
-          rbranch = git.object("#{branch[1].name}/#{branch[0].name}")
-          lcommit = lbranch.log.first
-          rcommit = rbranch.log.first
+          begin
+            rbranch = git.object("#{branch[1].name}/#{branch[0].name}")
+            lcommit = lbranch.log.first
+            rcommit = rbranch.log.first
           
-          (rbranch.log.map(&:sha).include?(lcommit.sha) && !lbranch.log.map(&:sha).include?(rcommit.sha)) ||
-          (!rbranch.log.map(&:sha).include?(lcommit.sha) && !lbranch.log.map(&:sha).include?(rcommit.sha))
+            (rbranch.log.map(&:sha).include?(lcommit.sha) && !lbranch.log.map(&:sha).include?(rcommit.sha)) ||
+            (!rbranch.log.map(&:sha).include?(lcommit.sha) && !lbranch.log.map(&:sha).include?(rcommit.sha))
+          rescue
+            true
+          end
         end
       end
 

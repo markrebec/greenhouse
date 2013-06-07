@@ -122,8 +122,11 @@ module Greenhouse
               return
             else
               begin
-                raise "Cound not push local branches" unless push_branches
-              rescue
+                #raise "Cound not push local branches" unless push_branches
+                push_branches
+              rescue Exception => e
+                puts e.message
+                puts e.backtrace
                 puts "\e[33mThere was a problem pushing local branches for #{@project.title}\e[0m"
                 puts "You may manually resolve conflicts in #{@project.path} and try again."
                 puts "\e[33mSkipping #{@project.title}...\e[0m"
@@ -157,7 +160,12 @@ module Greenhouse
           puts "#{indent_spaces indent}\e[33mYou have branches in #{@project.title} that haven't been pushed!\e[0m"
           puts
           @project.repository.ahead.each do |branch|
-            puts "#{indent_spaces indent}    branch #{branch[0].name} is ahead of #{branch[1].name}/#{branch[0].name}"
+            begin
+              rbranch = @project.repository.git.object("#{branch[1].name}/#{branch[0].name}")
+              puts "#{indent_spaces indent}    branch #{branch[0].name} is ahead of #{branch[1].name}/#{rbranch.name}"
+            rescue Exception => e
+              puts "#{indent_spaces indent}    branch #{branch[0].name} does not exist on remote #{branch[1].name}"
+            end
           end
           @project.repository.diverged.each do |branch|
             puts "#{indent_spaces indent}    branch #{branch[0].name} and #{branch[1].name}/#{branch[0].name} have diverged"
@@ -174,6 +182,15 @@ module Greenhouse
 
           @project.repository.diverged.each do |branch|
             puts "#{indent_spaces indent}    \e[37mbranch\e[0m #{branch[0].name} \e[37mand\e[0m #{branch[1].name}/#{branch[0].name} \e[37mhave diverged\e[0m"
+          end
+          puts
+        end
+
+        def print_not_checked_out_branches(indent=0)
+          puts "#{indent_spaces indent}\e[33mThe following branches are available to be checked out locally:\e[0m"
+          puts
+          @project.repository.not_checked_out.each do |branch|
+            puts "#{indent_spaces indent}    \e[37mbranch\e[0m #{branch.full.split("/").last} \e[37mis available on\e[0m #{branch.full.split("/")[1]}"
           end
           puts
         end
@@ -271,14 +288,20 @@ module Greenhouse
         def push_branches
           @project.repository.out_of_sync.each do |branch|
             begin
-              print "Attempting to merge #{branch[1].name}/#{branch[0].name} into #{branch[0].name} before pushing..."
-              @project.repository.git.checkout(branch[0].name)
-              @project.repository.git.merge("#{branch[1].name}/#{branch[0].name}")
-              puts "\e[32mSuccess.\e[0m"
+              # skip the merge if there's no remote branch
+              # TODO maybe check remote branches instead, or even better check for remote branch changes
+              rbranch = @project.repository.git.object("#{branch[1].name}/#{branch[0].name}")
+              begin
+                print "Attempting to merge #{branch[1].name}/#{branch[0].name} into #{branch[0].name} before pushing..."
+                @project.repository.git.checkout(branch[0].name)
+                @project.repository.git.merge("#{branch[1].name}/#{branch[0].name}")
+                puts "\e[32mSuccess.\e[0m"
+              rescue
+                # TODO detect unmerged files, allow to resolve inline?
+                puts "\e[31mFailed! Unresolved conflicts.\e[0m"
+                return false
+              end
             rescue
-              # TODO detect unmerged files, allow to resolve inline?
-              puts "\e[31mFailed! Unresolved conflicts.\e[0m"
-              return false
             end
           end
 
