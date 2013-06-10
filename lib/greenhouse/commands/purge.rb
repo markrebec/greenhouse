@@ -44,14 +44,13 @@ USAGE
             puts "Nothing to do."
             return
           end
-          #return unless force? || prompt
         
           purge
         else
           Tasks::PurgeProject.perform(app, force?)
         end
 
-        puts "\e[33mDone\e[0m"
+        puts "Done".yellow
         return
       end
 
@@ -61,29 +60,6 @@ USAGE
         end
 
         Tasks::RemoveGreenhouseFiles.perform(force?) if purge_all?
-      end
-  
-      def prompt
-        puts <<PUTS 
-\e[31mThis will completely clean out the ecosystem, removing all projects and 
-optionally dropping the database and wiping configuration files.\e[0m
-
-PUTS
-        puts <<PUTS
-You will be prompted if you have any uncommitted local changes or unpushed branches
-in any of your projects and may choose to either take action or skip that project
-to avoid losing any work.
-
-PUTS
-        puts <<PUTS
-You will be prompted separately to confirm whether you'd like to drop or keep your
-databases.
-PUTS
-
-        puts
-        print "Are you sure you want to continue? ([y]es/[N]o): "
-        continue = STDIN.gets.chomp.downcase
-        ["y","yes"].include?(continue)
       end
     
     end

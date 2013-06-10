@@ -6,7 +6,7 @@ module Greenhouse
 
       def perform(project)
         @project = project
-        puts "\e[33mRemoving #{@project.title} from your .projects file...\e[0m"
+        puts "Removing #{@project.title} from your .projects file...".yellow
         Projects::projects_file.projects.delete_if { |name,project| name == @project.name }
         Projects::projects_file.write
       end

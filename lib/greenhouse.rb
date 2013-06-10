@@ -1,6 +1,7 @@
 require 'bundler'
 require 'rake'
 require 'active_support/inflector'
+require 'inkjet'
 require 'greenhouse/version'
 require 'greenhouse/resources'
 require 'greenhouse/projects'

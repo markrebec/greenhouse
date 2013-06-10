@@ -12,7 +12,7 @@ module Greenhouse
           end
 
           if ['r','remove'].include?(remove) || force
-            puts "\e[33mRemoving default config file...\e[0m"
+            puts "Removing default config file...".yellow
             Projects::dotenv.unlink
           end
         end
@@ -24,7 +24,7 @@ module Greenhouse
           end
 
           if ['r','remove'].include?(remove) || force
-            puts "\e[33mRemoving .projects file...\e[0m"
+            puts "Removing .projects file...".yellow
             Projects::projects_file.unlink
           end
         end
@@ -36,7 +36,7 @@ module Greenhouse
           end
 
           if ['r','remove'].include?(remove) || force
-            puts "\e[33mRemoving .ignore file...\e[0m"
+            puts "Removing .ignore file...".yellow
             Projects::ignore_file.unlink
           end
         end
@@ -48,7 +48,7 @@ module Greenhouse
           end
 
           if ['r','remove'].include?(remove) || force
-            puts "\e[33mRemoving Procfile...\e[0m"
+            puts "Removing Procfile...".yellow
             Projects::procfile.unlink
           end
         end

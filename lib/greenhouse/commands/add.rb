@@ -13,7 +13,7 @@ module Greenhouse
           #  Tasks::ProjectStatus.perform(project)
           #end
           Projects.projects.each do |project|
-            puts "    \e[36m#{project.title}\e[0m"
+            puts "    #{project.title.cyan}"
           end
           puts
           print "Would you like to add another project? ([y]es/[N]o): "

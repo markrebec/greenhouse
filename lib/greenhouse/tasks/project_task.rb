@@ -15,11 +15,12 @@ module Greenhouse
         end
 
         def bundle(cmd='install')
-          puts "Running Bundler for \e[36m#{@project.title}\e[0m..."
+          puts "Running Bundler for #{@project.title.cyan}..."
+          raise "hi"
           @project.bundle(cmd)
           true
         rescue Exception => e
-          puts "\e[31mError running Bundler for #{@project.title}\e[0m"
+          puts "Error running Bundler for #{@project.title.cyan}".red
           puts "#{e.class.name}: #{e.message}"
           puts e.backtrace
           # TODO? prompt to continue?
@@ -27,7 +28,7 @@ module Greenhouse
         end
 
         def clone
-          puts "Cloning \e[36m#{@project.title}\e[0m (#{@project.repository.remote}) into #{@project.path}..."
+          puts "Cloning #{@project.title.cyan} (#{@project.repository.remote}) into #{@project.path}..."
           @project.repository.clone
             
           # Ignore the project's ignored files
@@ -38,7 +39,7 @@ module Greenhouse
           end
           true
         rescue Exception => e
-          puts "\e[31mCould not clone #{@project.title}\e[0m"
+          puts "Could not clone #{@project.title.cyan}".red
           puts "#{e.class.name}: #{e.message}"
           puts e.backtrace
           # TODO? prompt to continue?
@@ -46,7 +47,7 @@ module Greenhouse
         end
 
         def pull
-          print "Checking \e[36m#{@project.title}\e[0m git remotes for upstream commits... "
+          print "Checking #{@project.title.cyan} git remotes for upstream commits... "
           
           @project.repository.fetch # fetch the latest from remotes
           if @project.repository.out_of_sync?
@@ -63,7 +64,7 @@ module Greenhouse
             merge = nil
             stashed = false
             if @project.repository.changes?(false)
-              puts "\e[33mYou have uncommitted local changes in #{@project.path} on branch #{@project.repository.git.branch.name}\e[0m"
+              puts "You have uncommitted local changes in #{@project.path.cyan} on branch #{@project.repository.git.branch.name.white}".yellow
               while !['y','yes','n','no'].include?(merge) do
                 print "Would you like to stash your changes and merge the latest commits from upstream? ([y]es/[n]o): "
                 merge = STDIN.gets.chomp.downcase
@@ -127,70 +128,69 @@ module Greenhouse
               rescue Exception => e
                 puts e.message
                 puts e.backtrace
-                puts "\e[33mThere was a problem pushing local branches for #{@project.title}\e[0m"
+                puts "There was a problem pushing local branches for #{@project.title.cyan}".yellow
                 puts "You may manually resolve conflicts in #{@project.path} and try again."
-                puts "\e[33mSkipping #{@project.title}...\e[0m"
+                puts "Skipping #{@project.title.cyan}...".yellow
                 return
               end
             end
             
             return true
           else
-            puts "Nothing to push for \e[36m#{@project.title}\e[0m."
+            puts "Nothing to push for #{@project.title.cyan}"
           end
         end
 
-        # TODO move this to a logger class
-        def indent_spaces(indent=0)
-          indent.times.map {" "}.join
-        end
-
-        def print_local_changes(indent=0)
-          puts "#{indent_spaces indent}\e[33mYou have uncommitted changes in #{@project.title}!\e[0m"
-          puts "#{indent_spaces indent}The following files have uncommitted local modifications:"
+        def print_local_changes
+          puts "You have uncommitted changes in #{@project.title.cyan}!".yellow
           puts
-          @project.repository.changes.each do |name,file|
-            print "#{indent_spaces indent}#{file.untracked ? "U" : file.type}"
-            puts "   #{@project.path}/#{name}"
-          end
-          puts
-        end
-
-        def print_unpushed_branches(indent=0)
-          puts "#{indent_spaces indent}\e[33mYou have branches in #{@project.title} that haven't been pushed!\e[0m"
-          puts
-          @project.repository.ahead.each do |branch|
-            begin
-              rbranch = @project.repository.git.object("#{branch[1].name}/#{branch[0].name}")
-              puts "#{indent_spaces indent}    branch #{branch[0].name} is ahead of #{branch[1].name}/#{rbranch.name}"
-            rescue Exception => e
-              puts "#{indent_spaces indent}    branch #{branch[0].name} does not exist on remote #{branch[1].name}"
+          Inkjet.indent do
+            @project.repository.changes.each do |name,file|
+              puts "#{file.untracked ? "U" : file.type}    #{@project.path}/#{name}"
             end
           end
-          @project.repository.diverged.each do |branch|
-            puts "#{indent_spaces indent}    branch #{branch[0].name} and #{branch[1].name}/#{branch[0].name} have diverged"
+          puts
+        end
+
+        def print_unpushed_branches
+          puts "You have branches in #{@project.title.cyan} that haven't been pushed!".yellow
+          puts
+          Inkjet.indent do
+            @project.repository.ahead.each do |branch|
+              begin
+                rbranch = @project.repository.git.object("#{branch[1].name}/#{branch[0].name}")
+                puts "branch #{branch[0].name.magenta} is ahead of #{branch[1].name.magenta}/#{rbranch.name.magenta}"
+              rescue Exception => e
+                puts "branch #{branch[0].name.magenta} does not exist on remote #{branch[1].name.magenta}"
+              end
+            end
+            @project.repository.diverged.each do |branch|
+              puts "branch #{branch[0].name.magenta} and #{branch[1].name.magenta}/#{branch[0].name.magenta} have diverged"
+            end
           end
           puts
         end
 
-        def print_out_of_sync_branches(indent=0)
-          puts "#{indent_spaces indent}\e[33mYou have out of sync branches in #{@project.title}\e[0m"
+        def print_out_of_sync_branches
+          puts "You have out of sync branches in #{@project.title.cyan}".yellow
           puts
-          @project.repository.behind.each do |branch|
-            puts "#{indent_spaces indent}    \e[37mbranch\e[0m #{branch[0].name} \e[37mis behind\e[0m #{branch[1].name}/#{branch[0].name}"
-          end
+          Inkjet.indent do
+            @project.repository.behind.each do |branch|
+              puts "branch #{branch[0].name.magenta} is behind #{branch[1].name.magenta}/#{branch[0].name.magenta}"
+            end
 
-          @project.repository.diverged.each do |branch|
-            puts "#{indent_spaces indent}    \e[37mbranch\e[0m #{branch[0].name} \e[37mand\e[0m #{branch[1].name}/#{branch[0].name} \e[37mhave diverged\e[0m"
+            @project.repository.diverged.each do |branch|
+              puts "branch #{branch[0].name.magenta} and #{branch[1].name}/#{branch[0].name.magenta} have diverged"
+            end
           end
           puts
         end
 
-        def print_not_checked_out_branches(indent=0)
-          puts "#{indent_spaces indent}\e[33mThe following branches are available to be checked out locally:\e[0m"
+        def print_not_checked_out_branches
+          puts "The following branches are available to be checked out locally:".yellow
           puts
           @project.repository.not_checked_out.each do |branch|
-            puts "#{indent_spaces indent}    \e[37mbranch\e[0m #{branch.full.split("/").last} \e[37mis available on\e[0m #{branch.full.split("/")[1]}"
+            puts "branch #{branch.full.split("/").last.magenta} is available on #{branch.full.split("/")[1].magenta}".indent
           end
           puts
         end
@@ -295,10 +295,10 @@ module Greenhouse
                 print "Attempting to merge #{branch[1].name}/#{branch[0].name} into #{branch[0].name} before pushing..."
                 @project.repository.git.checkout(branch[0].name)
                 @project.repository.git.merge("#{branch[1].name}/#{branch[0].name}")
-                puts "\e[32mSuccess.\e[0m"
+                puts "Success.".green
               rescue
                 # TODO detect unmerged files, allow to resolve inline?
-                puts "\e[31mFailed! Unresolved conflicts.\e[0m"
+                puts "Failed! Unresolved conflicts.".red
                 return false
               end
             rescue
@@ -309,7 +309,7 @@ module Greenhouse
           @project.repository.branches.local.each do |branch|
             @project.repository.push('origin', branch.name)
           end
-          puts "\e[32mSuccess.\e[0m"
+          puts "Success.".green
           return true
         end
 
@@ -331,14 +331,14 @@ module Greenhouse
               end
 
               if %w(s skip).include?(commit)
-                puts "\e[33mSkipping #{@project.title}...\e[0m"
+                puts "Skipping #{@project.title.cyan}...".yellow
                 return
               elsif %w(c commit).include?(commit)
                 begin
                   raise "Could not commit local changes" unless commit_changes
                 rescue
-                  puts "\e[33mThere was a problem committing local changes to #{@project.title}\e[0m"
-                  puts "\e[33mSkipping #{@project.title}...\e[0m"
+                  puts "There was a problem committing local changes to #{@project.title.cyan}".red
+                  puts "Skipping #{@project.title.cyan}...".yellow
                   return
                 end
               end
@@ -356,15 +356,15 @@ module Greenhouse
               end
 
               if %w(s skip).include?(push)
-                puts "\e[33mSkipping #{@project.title}...\e[0m"
+                puts "Skipping #{@project.title.cyan}...".yellow
                 return
               elsif %w(p push).include?(push)
                 begin
                   raise "Cound not push local branches" unless push_branches
                 rescue
-                  puts "\e[33mThere was a problem pushing local branches for #{@project.title}\e[0m"
+                  puts "There was a problem pushing local branches for #{@project.title.cyan}".yellow
                   puts "You may manually resolve conflicts in #{@project.path} and try again."
-                  puts "\e[33mSkipping #{@project.title}...\e[0m"
+                  puts "Skipping #{@project.title.cyan}...".yellow
                   return
                 end
               end
@@ -372,7 +372,7 @@ module Greenhouse
           
           end
           
-          puts "\e[33mRemoving #{@project.title} project directory...\e[0m"
+          puts "Removing #{@project.title.cyan} project directory...".yellow
 
           Projects::procfile.processes.delete_if do |key,process|
             # this is sort of generic, just checks for the project name in the key/cmd

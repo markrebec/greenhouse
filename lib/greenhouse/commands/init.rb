@@ -48,7 +48,7 @@ IGNORE
       
       after_hook do
         puts
-        puts "New ecosystem initialized in \e[36m#{Projects::path}\e[0m"
+        puts "New ecosystem initialized in #{Projects::path.magenta}"
       end
 
       class << self
@@ -62,7 +62,7 @@ IGNORE
         while !['', 'n','no'].include?(another) do
           puts "The following projects will be initialized in your ecosystem:"
           Projects.projects.each do |project|
-            puts "    \e[36m#{project.title}\e[0m"
+            puts "    #{project.title.cyan}"
           end
           puts
           print "Would you like to add another project before initializing? ([y]es/[N]o): "

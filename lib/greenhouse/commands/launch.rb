@@ -64,16 +64,16 @@ USAGE
                   require 'dotenv'
                   Dotenv.load!
                 rescue
-                  puts "\e[31mError parsing .env file for #{app.title}.\e[0m"
+                  puts "Error parsing .env file for #{app.title.cyan}.".red
                   exit 1
                 end
               else
-                puts "\e[33mWarning: No .env file found in #{app.title}!\e[0m"
+                puts "Warning: No .env file found in #{app.title.cyan}!".yellow
                 puts "Your application may not behave as expected without a .env file."
               end
               
               unless app.procfile.exists?
-                puts "\e[31mNo Procfile found for #{app.title}\e[0m"
+                puts "No Procfile found for #{app.title.cyan}".red
                 exit 1
               end
 

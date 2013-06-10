@@ -11,7 +11,7 @@ module Greenhouse
         project = Projects::Project.new(remote.match(/([^\/]*)\.git/)[1], {remote: remote})
         
         if Projects::projects_file.projects.keys.include?(project.name) || Projects::projects_file.projects.values.map { |p| p['git'].downcase }.include?(project.repository.remote.downcase)
-          puts "\e[31mCannot add project. Another project with the same name already exists.\e[0m"
+          puts "Cannot add project. Another project with the same name already exists.".red
           # TODO prompt to replace it?
           # would need to probably remove the project, remove procs from procfile, resync project, reconfig, etc.
           return
@@ -42,7 +42,7 @@ module Greenhouse
         
         Projects::projects_file.write
 
-        puts "Added \e[36m#{project.title}\e[0m to the ecosystem."
+        puts "Added #{project.title.cyan} to the ecosystem."
         project
       end
 

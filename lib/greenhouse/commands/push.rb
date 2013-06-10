@@ -29,7 +29,7 @@ USAGE
 
       def push_project(project)
         unless project.exists?
-          puts "Project \e[36m#{project.title}\e[0m does not exist. Try initializing it with `greenhouse init`"
+          puts "Project #{project.title.cyan} does not exist. Try initializing it with `greenhouse init`"
           return
         end
 
