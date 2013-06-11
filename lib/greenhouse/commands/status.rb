@@ -46,7 +46,6 @@ USAGE
         end
 
         Projects::send(project_type).each do |project|
-          puts
           Tasks::ProjectStatus.perform(project, with_git?)
         end
       end

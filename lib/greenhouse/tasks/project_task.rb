@@ -142,7 +142,8 @@ module Greenhouse
         end
 
         def print_local_changes
-          puts "You have uncommitted changes in #{@project.title.cyan}!".yellow
+          puts
+          puts "You have uncommitted changes in #{@project.title.cyan}!".red
           puts
           Inkjet.indent do
             @project.repository.changes.each do |name,file|
@@ -153,44 +154,47 @@ module Greenhouse
         end
 
         def print_unpushed_branches
-          puts "You have branches in #{@project.title.cyan} that haven't been pushed!".yellow
+          puts
+          puts "You have branches in #{@project.title.cyan} that haven't been pushed!".blue
           puts
           Inkjet.indent do
             @project.repository.ahead.each do |branch|
               begin
                 rbranch = @project.repository.git.object("#{branch[1].name}/#{branch[0].name}")
-                puts "branch #{branch[0].name.magenta} is ahead of #{branch[1].name.magenta}/#{rbranch.name.magenta}"
+                puts "branch #{branch[0].name.bold} is #{"ahead".cyan} of #{branch[1].name.bold}/#{rbranch.name.bold}"
               rescue Exception => e
-                puts "branch #{branch[0].name.magenta} does not exist on remote #{branch[1].name.magenta}"
+                puts "branch #{branch[0].name.bold} #{"does not exist".blue} on remote #{branch[1].name.bold}"
               end
             end
             @project.repository.diverged.each do |branch|
-              puts "branch #{branch[0].name.magenta} and #{branch[1].name.magenta}/#{branch[0].name.magenta} have diverged"
+              puts "branch #{branch[0].name.bold} and #{branch[1].name.bold}/#{branch[0].name.bold} have #{"diverged".magenta}"
             end
           end
           puts
         end
 
         def print_out_of_sync_branches
+          puts
           puts "You have out of sync branches in #{@project.title.cyan}".yellow
           puts
           Inkjet.indent do
             @project.repository.behind.each do |branch|
-              puts "branch #{branch[0].name.magenta} is behind #{branch[1].name.magenta}/#{branch[0].name.magenta}"
+              puts "branch #{branch[0].name.bold} is #{"behind".yellow} #{branch[1].name.bold}/#{branch[0].name.bold}"
             end
 
             @project.repository.diverged.each do |branch|
-              puts "branch #{branch[0].name.magenta} and #{branch[1].name}/#{branch[0].name.magenta} have diverged"
+              puts "branch #{branch[0].name.bold} and #{branch[1].name}/#{branch[0].name.bold} have #{"diverged".magenta}"
             end
           end
           puts
         end
 
         def print_not_checked_out_branches
-          puts "The following branches are available to be checked out locally:".yellow
+          puts
+          puts "The following branches are available to be checked out locally:".green
           puts
           @project.repository.not_checked_out.each do |branch|
-            puts "branch #{branch.full.split("/").last.magenta} is available on #{branch.full.split("/")[1].magenta}".indent
+            puts "branch #{branch.full.split("/").last.bold} is #{"available".green} from #{branch.full.split("/")[1].bold}".indent
           end
           puts
         end
