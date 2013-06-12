@@ -28,10 +28,12 @@ module Greenhouse
             puts
 
             if verbose
-              print_local_changes if @project.repository.changes?
-              print_unpushed_branches if @project.repository.ahead?
-              print_out_of_sync_branches if @project.repository.out_of_sync?
-              print_not_checked_out_branches if @project.repository.not_checked_out?
+              Inkjet.indent do
+                print_local_changes if @project.repository.changes?
+                print_unpushed_branches if @project.repository.ahead?
+                print_out_of_sync_branches if @project.repository.out_of_sync?
+                print_not_checked_out_branches if @project.repository.not_checked_out?
+              end
             end
           end
         end
