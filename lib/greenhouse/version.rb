@@ -1,8 +1,14 @@
 module Greenhouse
-  VERSION = "0.0.7"
+  VERSION = "0.0.8"
 end
 
 __END__
+0.0.8:
+* Fix for git failures when remote branches don't yet exist
+* Printing untracked remote branches in status
+* Cleaned up the status command printouts overall to make them more compact and easier to read
+* Utilizing inkjet gem for formatting, colors and indentation
+
 0.0.7:
 * Simple bundler command to run install/update for a single or all projects
 * Refactor `status` command, renamed --verbose flag to --git, only fetching git remotes with --git flag
