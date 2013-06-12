@@ -1,8 +1,11 @@
 module Greenhouse
-  VERSION = "0.0.8"
+  VERSION = "0.0.9"
 end
 
 __END__
+0.0.9:
+* Removing a really stupid debug raise call that got missed in the last release (need to write specs!!)
+
 0.0.8:
 * Fix for git failures when remote branches don't yet exist
 * Printing untracked remote branches in status
