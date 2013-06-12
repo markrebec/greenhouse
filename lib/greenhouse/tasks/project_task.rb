@@ -16,13 +16,10 @@ module Greenhouse
 
         def bundle(cmd='install')
           puts "Running Bundler for #{@project.title.cyan}..."
-          raise "hi"
           @project.bundle(cmd)
           true
         rescue Exception => e
           puts "Error running Bundler for #{@project.title.cyan}".red
-          puts "#{e.class.name}: #{e.message}"
-          puts e.backtrace
           # TODO? prompt to continue?
           false
         end
