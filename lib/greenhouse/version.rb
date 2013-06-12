@@ -1,8 +1,12 @@
 module Greenhouse
-  VERSION = "0.0.9"
+  VERSION = "0.0.10"
 end
 
 __END__
+0.0.10:
+* Adding a -d/--debug flag to output full backtraces
+* Not writing empty .env vars
+
 0.0.9:
 * Removing a really stupid debug raise call that got missed in the last release (need to write specs!!)
 
