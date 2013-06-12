@@ -3,9 +3,14 @@ module Greenhouse
     include Scripts::Script
 
     valid_argument Scripts::Argument.new("-v, --verbose", :valid => [], :summary => "Output additional information from command executions to STDOUT")
+    valid_argument Scripts::Argument.new("-d, --debug", :valid => [], :summary => "Output full backtraces for exceptions and errors")
 
     def self.verbose?
       user_arguments.map(&:key).include?("-v")
+    end
+
+    def self.debug?
+      user_arguments.map(&:key).include?("-d")
     end
 
     def self.exec(cmd)

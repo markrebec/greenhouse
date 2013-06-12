@@ -34,6 +34,7 @@ module Greenhouse
             after_hooks.each { |block| @command.instance_eval(&block) }
           rescue Exception => e
             puts e.message
+            puts e.backtrace if ::Greenhouse::CLI.debug?
             @command.usage if e.is_a?(Scripts::InvalidArgument)
             return
           end
