@@ -49,6 +49,7 @@ module Greenhouse
       def write
         open("w") do |f|
           @config.each do |key,val|
+            next if val.nil? || val.empty?
             f.write("#{key}=#{val}\n")
           end
         end
