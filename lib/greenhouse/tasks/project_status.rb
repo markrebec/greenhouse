@@ -4,9 +4,9 @@ module Greenhouse
       include Task
       include ProjectTask
 
-      def perform(project, verbose=false)
+      def perform(project, fetch=false, verbose=false, remote=false)
         @project = project
-        @project.repository.fetch if verbose && @project.exists?
+        @project.repository.fetch if fetch && @project.exists?
 
         Inkjet.indent do
           print "#{@project.title.cyan} (#{@project.type.capitalize})"
@@ -26,15 +26,16 @@ module Greenhouse
             end
             
             puts
-
+            
             if verbose
               Inkjet.indent do
                 print_local_changes if @project.repository.changes?
                 print_unpushed_branches if @project.repository.ahead?
                 print_out_of_sync_branches if @project.repository.out_of_sync?
-                print_not_checked_out_branches if @project.repository.not_checked_out?
               end
             end
+
+            Inkjet.indent { print_not_checked_out_branches } if remote && @project.repository.not_checked_out?
           end
         end
 

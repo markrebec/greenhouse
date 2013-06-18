@@ -188,7 +188,7 @@ module Greenhouse
 
         def print_not_checked_out_branches
           puts
-          puts "The following branches are available to be checked out locally:".green
+          puts "The following branches are available in #{@project.title.cyan}:".green
           puts
           @project.repository.not_checked_out.each do |branch|
             puts "branch #{branch.full.split("/").last.bold} is #{"available".green} from #{branch.full.split("/")[1].bold}".indent
