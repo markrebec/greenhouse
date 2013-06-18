@@ -43,7 +43,7 @@ module Greenhouse
           false
         end
 
-        def pull
+        def pull(force=false)
           print "Checking #{@project.title.cyan} git remotes for upstream commits... "
           
           @project.repository.fetch # fetch the latest from remotes
@@ -62,9 +62,14 @@ module Greenhouse
             stashed = false
             if @project.repository.changes?(false)
               puts "You have uncommitted local changes in #{@project.path.cyan} on branch #{@project.repository.git.branch.name.white}".yellow
-              while !['y','yes','n','no'].include?(merge) do
-                print "Would you like to stash your changes and merge the latest commits from upstream? ([y]es/[n]o): "
-                merge = STDIN.gets.chomp.downcase
+
+              if force
+                merge = 'yes'
+              else
+                while !['y','yes','n','no'].include?(merge) do
+                  print "Would you like to stash your changes and merge the latest commits from upstream? ([y]es/[n]o): "
+                  merge = STDIN.gets.chomp.downcase
+                end
               end
 
               if ['y','yes'].include?(merge)
@@ -73,9 +78,13 @@ module Greenhouse
                 @project.repository.stash
               end
             else
-              while !['y','yes','n','no'].include?(merge) do
-                print "Would you like to attempt to merge the latest commits from upstream? ([y]es/[n]o): "
-                merge = STDIN.gets.chomp.downcase
+              if force
+                merge = 'yes'
+              else
+                while !['y','yes','n','no'].include?(merge) do
+                  print "Would you like to attempt to merge the latest commits from upstream? ([y]es/[n]o): "
+                  merge = STDIN.gets.chomp.downcase
+                end
               end
             end
 
@@ -108,12 +117,16 @@ module Greenhouse
           end
         end
 
-        def push
+        def push(force=false)
           if @project.repository.ahead? || @project.repository.diverged?
             print_unpushed_branches
 
-            print "Would you like to push these branches now? ([P]ush/[s]kip): "
-            push = STDIN.gets.chomp.downcase
+            if force
+              push = 'push'
+            else
+              print "Would you like to push these branches now? ([P]ush/[s]kip): "
+              push = STDIN.gets.chomp.downcase
+            end
 
             if %w(s skip).include?(push)
               puts "Skipped #{@project.title}"

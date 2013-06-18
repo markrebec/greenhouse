@@ -3,6 +3,7 @@ module Greenhouse
     class Pull
       include Command
       command_summary "Pull and merge remote branches for all projects"
+      valid_argument Scripts::Argument.new("-f, --force", :summary => "Pull and merge all projects without prompting")
       project_arguments *Projects::projects.map(&:to_arg)
       
       class << self
@@ -10,10 +11,17 @@ module Greenhouse
           puts <<USAGE
 usage: #{::Greenhouse::CLI.command_name} #{command_name} [<project>] #{valid_arguments.to_s}
 
+Arguments:
+#{valid_arguments.to_help}
+
 Projects:
 #{project_arguments.to_help}
 USAGE
         end
+      end
+      
+      def force?
+        arguments.map(&:key).include?("-f")
       end
 
       def pull_all
@@ -23,7 +31,7 @@ USAGE
         end
 
         Projects.projects.each do |project|
-          Tasks::PullProject.perform(project)
+          Tasks::PullProject.perform(project, force?)
         end
       end
 
@@ -33,7 +41,7 @@ USAGE
           return
         end
 
-        Tasks::PullProject.perform(project)
+        Tasks::PullProject.perform(project, force?)
       end
 
       def run

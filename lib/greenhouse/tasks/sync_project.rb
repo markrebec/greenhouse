@@ -4,12 +4,12 @@ module Greenhouse
       include Task
       include ProjectTask
 
-      def perform(project)
+      def perform(project, force=false)
         @project = project
 
         if @project.exists?
-          pull && bundle
-          push
+          pull(force) && bundle
+          push(force)
         else
           clone && bundle
         end

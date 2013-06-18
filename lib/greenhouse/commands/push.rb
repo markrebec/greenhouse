@@ -3,6 +3,7 @@ module Greenhouse
     class Push
       include Command
       command_summary "Push local branches for all projects to their git remotes"
+      valid_argument Scripts::Argument.new("-f, --force", :summary => "Push all branches without prompting")
       project_arguments *Projects::projects.map(&:to_arg)
       
       class << self
@@ -10,10 +11,17 @@ module Greenhouse
           puts <<USAGE
 usage: #{::Greenhouse::CLI.command_name} #{command_name} [<project>] #{valid_arguments.to_s}
 
+Arguments:
+#{valid_arguments.to_help}
+
 Projects:
 #{project_arguments.to_help}
 USAGE
         end
+      end
+      
+      def force?
+        arguments.map(&:key).include?("-f")
       end
 
       def push_all
@@ -23,7 +31,7 @@ USAGE
         end
 
         Projects.projects.each do |project|
-          Tasks::PushProject.perform(project)
+          Tasks::PushProject.perform(project, force?)
         end
       end
 
@@ -33,7 +41,7 @@ USAGE
           return
         end
 
-        Tasks::PushProject.perform(project)
+        Tasks::PushProject.perform(project, force?)
       end
 
       def run

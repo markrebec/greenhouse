@@ -4,10 +4,10 @@ module Greenhouse
       include Task
       include ProjectTask
 
-      def perform(project)
+      def perform(project, force=false)
         @project = project
         
-        pull && bundle
+        pull(force) && bundle
       end
     end
   end
