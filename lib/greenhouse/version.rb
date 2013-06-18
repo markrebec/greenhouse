@@ -1,8 +1,12 @@
 module Greenhouse
-  VERSION = "0.0.10"
+  VERSION = "0.0.11"
 end
 
 __END__
+0.0.11:
+* --force flag for push/pull/sync commands
+* --verbose and --remote flag for status to control verbosity and printing remote branches
+
 0.0.10:
 * Adding a -d/--debug flag to output full backtraces
 * Not writing empty .env vars
