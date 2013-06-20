@@ -6,6 +6,7 @@ __END__
 0.0.11:
 * --force flag for push/pull/sync commands
 * --verbose and --remote flag for status to control verbosity and printing remote branches
+* explicitly converting dotenv values to strings before checking or writing them
 
 0.0.10:
 * Adding a -d/--debug flag to output full backtraces
